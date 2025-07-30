@@ -6,7 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import './Table.css';
-import type { MouseEvent as ReactMouseEvent } from "react";
+import type { FormEvent, MouseEvent as ReactMouseEvent } from "react";
 
 const Table = () => {
   const API_URL = "https://api.artic.edu/api/v1/artworks";
@@ -52,15 +52,25 @@ const Table = () => {
     }
   }
 
+  const handleRowSelectionSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const amount = e.currentTarget.amount.value;
+    const rowsToSelect = data.slice(0, amount);
+    setSelectedRecords(rowsToSelect);
+    if (op.current) {
+      op.current.hide();
+    }
+  }
+
   return (
     <div>
       <OverlayPanel ref={op} > 
-        <form style={{
+        <form onSubmit={handleRowSelectionSubmit} style={{
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
         }}>
-          <InputText placeholder="Select Rows.." keyfilter={"int"} />
+          <InputText placeholder="Select Rows.." keyfilter={"int"} name="amount" />
           <Button type="submit"> Submit </Button>
         </form>
       </OverlayPanel>
