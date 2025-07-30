@@ -1,5 +1,5 @@
 import { Column } from "primereact/column";
-import { DataTable, type DataTablePageEvent } from "primereact/datatable";
+import { DataTable, type DataTablePageEvent, type DataTableValue } from "primereact/datatable";
 import { useCallback, useEffect, useState } from "react";
 
 const Table = () => {
@@ -7,6 +7,8 @@ const Table = () => {
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [page, setPage] = useState(1);
+  const [selectedRecords, setSelectedRecords] = useState<DataTableValue | null>(null);
+  const [rowClick] = useState(false);
   const rowsPerPage = 12;
 
   const fetchData = useCallback((targetPage: number) => {
@@ -33,6 +35,10 @@ const Table = () => {
     }
   };
 
+  const handleSelectionChange = (e: DataTableValue) => {
+    setSelectedRecords(e.value);
+  };
+
   return (
     <div>
       <DataTable
@@ -43,7 +49,15 @@ const Table = () => {
         totalRecords={totalRecords}
         onPage={handleOnPage}
         first={(page - 1) * rowsPerPage}
+        selection={selectedRecords}
+        onSelectionChange={handleSelectionChange}
+        dataKey="id"
+        selectionMode={rowClick ? "single" : undefined}
+        onRowClick={rowClick ? (e) => setSelectedRecords(e.data) : undefined}
       >
+        {!rowClick && (
+          <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} />
+        )}
         <Column
           field="title"
           header="Title"

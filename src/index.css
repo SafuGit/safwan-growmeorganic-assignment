@@ -4,6 +4,10 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.font-segoe {
+  font-family: 'Segoe UI', sans-serif;
+}
+
 body {
   width: 90vw;
   margin: 0 auto;
