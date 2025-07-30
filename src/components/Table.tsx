@@ -1,6 +1,12 @@
+import { ChevronDown } from "lucide-react";
+import { Button } from "primereact/button";
 import { Column } from "primereact/column";
 import { DataTable, type DataTablePageEvent, type DataTableValue } from "primereact/datatable";
-import { useCallback, useEffect, useState } from "react";
+import { InputText } from "primereact/inputtext";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { useCallback, useEffect, useRef, useState } from "react";
+import './Table.css';
+import type { MouseEvent as ReactMouseEvent } from "react";
 
 const Table = () => {
   const API_URL = "https://api.artic.edu/api/v1/artworks";
@@ -10,6 +16,7 @@ const Table = () => {
   const [selectedRecords, setSelectedRecords] = useState<DataTableValue | null>(null);
   const [rowClick] = useState(false);
   const rowsPerPage = 12;
+  const op = useRef<OverlayPanel | null>(null);
 
   const fetchData = useCallback((targetPage: number) => {
     fetch(`${API_URL}?page=${targetPage}`)
@@ -39,8 +46,24 @@ const Table = () => {
     setSelectedRecords(e.value);
   };
 
+  const handleRowSelectionPanel = (e: ReactMouseEvent<HTMLButtonElement>) => {
+    if (op.current) {
+      op.current.toggle(e);
+    }
+  }
+
   return (
     <div>
+      <OverlayPanel ref={op} > 
+        <form style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1rem",
+        }}>
+          <InputText placeholder="Select Rows.." keyfilter={"int"} />
+          <Button type="submit"> Submit </Button>
+        </form>
+      </OverlayPanel>
       <DataTable
         lazy
         value={data}
@@ -56,7 +79,19 @@ const Table = () => {
         onRowClick={rowClick ? (e) => setSelectedRecords(e.data) : undefined}
       >
         {!rowClick && (
-          <Column selectionMode="multiple" headerStyle={{ width: "3rem" }} />
+          <Column headerClassName="selectionHeader" selectionMode="multiple" headerStyle={
+            { 
+              width: "3rem",
+            }
+          } header={() => (
+            <div>
+              <Button icon={<ChevronDown />} onClick={handleRowSelectionPanel} style={{
+                backgroundColor: "transparent",
+                color: "black",
+                border: "none",
+              }} />
+            </div>
+          )}  />
         )}
         <Column
           field="title"
