@@ -32,7 +32,8 @@ const Table = () => {
 
   useEffect(() => {
     fetchData(page);
-  }, [fetchData, page]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleOnPage = (e: DataTablePageEvent) => {
     if (typeof e.page === "number") {
