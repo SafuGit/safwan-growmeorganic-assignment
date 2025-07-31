@@ -52,10 +52,22 @@ const Table = () => {
     }
   }
 
-  const handleRowSelectionSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleRowSelectionSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const amount = e.currentTarget.amount.value;
-    const rowsToSelect = data.slice(0, amount);
+    const amount = parseInt(e.currentTarget.amount.value);
+    const pagesNeeded = Math.ceil(amount / rowsPerPage);
+
+    const newData: Array<object> = [];
+
+    for (let i = 1; i <= pagesNeeded; i++) {
+      const res = await fetch(`${API_URL}?page=${i}`);
+      const json = await res.json();
+      newData.push(...json.data);
+
+      if (newData.length >= amount) break;
+    }
+
+    const rowsToSelect = newData.slice(0, amount);
     setSelectedRecords(rowsToSelect);
     if (op.current) {
       op.current.hide();
